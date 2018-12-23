@@ -1,3 +1,5 @@
+build
+
 # Logs
 logs
 *.log
@@ -85,3 +87,5 @@ typings/
 *.tfstate*
 .terraform
 tests-build
+
+.rts2_cache_umd

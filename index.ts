@@ -1,10 +1,11 @@
-import { functions } from './funcs.js'
+import './types.ts'
+import { makeRunner } from './funcs'
 
-addEventListener('fetch', event => {
+addEventListener('fetch', (event: FetchEvent) => {
   event.respondWith(handleRequest(event.request))
 })
 
-async function handleRequest(request) {
+async function handleRequest(request: Request): Promise<Response> {
   try {
     return await handleRequestThrowing(request)
   }
@@ -16,11 +17,11 @@ async function handleRequest(request) {
 }
 
 
-function adjustedPath(path) {
+function adjustedPath(path: string): string {
   return path.split('/pipeline')[1]
 }
 
-function jsonResponse(json) {
+function jsonResponse(json): Response {
   return new Response(JSON.stringify(json, null, '  '), {
     headers: {
       "Content-Type": "application/json"
@@ -28,11 +29,7 @@ function jsonResponse(json) {
   })
 }
 
-/**
- * Fetch and log a given request object
- * @param {Request} request
- */
-async function handleRequestThrowing(request) {
+async function handleRequestThrowing(request: Request): Promise<Response> {
   const keys = Object.keys(self)
 
   const url = new URL(request.url);
@@ -40,7 +37,7 @@ async function handleRequestThrowing(request) {
 
   if (/^\/1\//.test(path)) {
     const argsRaw = decodeURIComponent(path.substring(3))
-    const functionsForRequest = functions({ request })
+    const run = makeRunner({ request })
 
     const pipeline = argsRaw.split('|>')
 
@@ -51,20 +48,17 @@ async function handleRequestThrowing(request) {
         arity = 0;
       }
 
-      const f = functionsForRequest[arity](item)
-      if (f == null) {
-        throw new Error(`Invalid input or command ${item}/${arity}`)
-      }
-
-      return f(await memo);
+      return run(item, arity === 0 ? [] : [await memo]);
     }, initial)
 
-    if (!!result && !!result.body) {
-      return result
+    const response = result as Response
+    if (!!response && !!response.body) {
+      return response
     }
 
-    if (!!result && typeof result.getReader === 'function') {
-      return new Response(result)
+    const readable = result as ReadableStream
+    if (!!readable && typeof readable.getReader === 'function') {
+      return new Response(readable)
     }
 
     return jsonResponse({
