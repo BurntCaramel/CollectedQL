@@ -83,6 +83,9 @@ export function makeRunner({ request }: { request: Request }) {
       'Fetch.body': async (res: Response) => {
         return res.body;
       },
+      'Fetch.status': async (res: Response) => {
+        return res.status;
+      },
       'Fetch.headers': async (res: Response) => {
         return Array.from(res.headers as unknown as Iterable<Array<string>>);
       },

@@ -48,14 +48,24 @@ describe("funcs", () => {
     })
   });
 
-  it('returns a response when fetching a URL', async () => {
-    const mockResponse = {};
-    const fetch = jest.fn(() => mockResponse);
-    global.fetch = fetch;
-    
-    const result = await run('Fetch.get', ['https://example.org/']);
+  describe('Fetch', () => {
+    it('returns a response when fetching a URL', async () => {
+      const mockResponse = {};
+      const fetch = jest.fn(() => mockResponse);
+      global.fetch = fetch;
+      
+      const result = await run('Fetch.get', ['https://example.org/']);
+  
+      expect(result).toBe(mockResponse);
+      expect(fetch).toHaveBeenCalledWith('https://example.org/');
+    });
 
-    expect(result).toBe(mockResponse);
-    expect(fetch).toHaveBeenCalledWith('https://example.org/');
-  });
+    it('returns a response when fetching a URL', async () => {
+      const mockResponse = { status: 404 } as Response;
+      
+      const result = await run('Fetch.status', [mockResponse]);
+  
+      expect(result).toEqual(404);
+    });
+  })
 });
