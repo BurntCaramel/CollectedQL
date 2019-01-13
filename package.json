@@ -5,11 +5,22 @@
   "main": "run-tests.js",
   "dependencies": {},
   "devDependencies": {
+    "@types/jest": "^23.3.12",
+    "@types/node": "^10.12.18",
+    "@types/puppeteer-core": "^1.9.0",
+    "@types/text-encoding": "0.0.35",
+    "fast-text-encoding": "^1.0.0",
+    "jest": "^23.6.0",
+    "jest-puppeteer": "^3.7.0",
     "microbundle": "^0.9.0",
-    "puppeteer-core": "^1.11.0"
+    "node-webcrypto-ossl": "^1.0.39",
+    "puppeteer-core": "^1.11.0",
+    "ts-jest": "^23.10.5",
+    "typescript": "^3.2.2"
   },
   "scripts": {
-    "test": "node run-tests.js"
+    "old-test": "node run-tests.js",
+    "test": "jest"
   },
   "author": "",
   "license": "MIT"
