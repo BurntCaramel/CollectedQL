@@ -1,3 +1,4 @@
+/// <reference types="node-webcrypto-ossl" />
 import "fast-text-encoding";
 import WebCrypto from "node-webcrypto-ossl";
 
