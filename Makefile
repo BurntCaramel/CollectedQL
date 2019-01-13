@@ -1,10 +1,17 @@
 default: test
 
-build/piping.umd.js: index.ts funcs.ts Makefile
-	@./node_modules/.bin/microbundle build -i index.ts -o build --format umd --name piping
+source_files := $(wildcard src/*.ts)
 
-deploy: build/piping.umd.js
+build/piping.umd.js: $(source_files) Makefile
+	./node_modules/.bin/microbundle build -i src/index.ts -o build --format umd --name piping
+
+.PHONY: build
+build: build/piping.umd.js
+
+.PHONY: deploy
+deploy: build
 	cd terraform && terraform apply
 
+.PHONY: test
 test:
 	@npm t

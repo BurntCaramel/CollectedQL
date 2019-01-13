@@ -3,7 +3,7 @@
 //     respondWith(r: Promise<Response> | Response): Promise<Response>;
 // }
 
-interface FetchEvent extends ExtendableEvent {
+interface FetchEvent2 extends ExtendableEvent {
   readonly clientId: string;
   readonly preloadResponse: Promise<any>;
   readonly request: Request;
