@@ -2,7 +2,7 @@ default: test
 
 source_files := $(wildcard src/*.ts)
 
-build/piping.umd.js: $(source_files) Makefile
+build/piping.umd.js: $(source_files) Makefile tsconfig.json
 	./node_modules/.bin/microbundle build -i src/index.ts -o build --format umd --name piping
 
 .PHONY: build
