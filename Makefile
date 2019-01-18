@@ -15,3 +15,7 @@ deploy: build
 .PHONY: test
 test:
 	@npm t
+
+.PHONY: dev
+dev:
+	@npm run dev
