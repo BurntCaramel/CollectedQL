@@ -1,3 +1,7 @@
+import { config } from "./config.secret";
+import * as Digest from "./modules/Digest";
+import * as Store from "./modules/Store";
+
 function hex(view: DataView): string {
   var hexCodes = [];
   for (var i = 0; i < view.byteLength; i += 4) {
@@ -69,67 +73,34 @@ function def1(defs: Record<string, UnaryFunc>): (input: string) => (value: any) 
   }
 }
 
+const unaryFuncs = def1({
+  'Fetch.get': async (url: string): Promise<Response> => {
+    const res = await fetch(url)
+    return res;
+  },
+  'Fetch.body': async (res: Response): Promise<ReadableStream<Uint8Array> | null> => {
+    return res.body;
+  },
+  'Fetch.status': async (res: Response): Promise<number> => {
+    return res.status;
+  },
+  'Fetch.headers': async (res: Response) => {
+    return Array.from(res.headers as unknown as Iterable<Array<string>>);
+  },
+  'sha256': Digest.sha256, // TODO: remove
+  'Digest.sha256': Digest.sha256,
+  'Store.addTextMarkdown': Store.addTextMarkdown,
+  'Store.readTextMarkdown': Store.readTextMarkdown
+})
+
 export function makeRunner({ request }: { request: Request }) {
   const arityToFuncs: Array<((input: string) => (...args: Array<PipableType>) => PipableType | Promise<PipableType>)> = [
     def0([
       ['Viewer.ipAddress', () => request.headers.get('CF-Connecting-IP')],
-      [/^"(.*)"$/, (_ , s) => s]
+      ['Input.read', () => request.body],
+      [/^"(.*)"$/, (_ , s) => s],
     ]),
-    def1({
-      'Fetch.get': async (url: string) => {
-        const res = await fetch(url)
-        return res;
-      },
-      'Fetch.body': async (res: Response) => {
-        return res.body;
-      },
-      'Fetch.status': async (res: Response) => {
-        return res.status;
-      },
-      'Fetch.headers': async (res: Response) => {
-        return Array.from(res.headers as unknown as Iterable<Array<string>>);
-      },
-      'sha256': async (value: string | ReadableStream | null) => {
-        if (!value) {
-          throw 'Digest must be passed valid data type';
-        }
-
-        let data: Uint8Array;
-
-        const stream = value as ReadableStream;
-        if (typeof stream.getReader === 'function') {
-          let chunks: Array<number> = []
-          const reader = (value as ReadableStream<number>).getReader()
-          await reader.read().then(function next({ done, value }): ReadableStreamReadResult<number> | Promise<ReadableStreamReadResult<number>> {
-            // Result objects contain two properties:
-            // done  - true if the stream has already given you all its data.
-            // value - some data. Always undefined when done is true.
-            if (done) {
-              return { done: true, value: 0 };
-            }
-
-            // value for fetch streams is a Uint8Array
-            chunks.push(value);
-
-            // Read some more, and call this function again
-            return reader.read().then(next);
-          });
-          data = new Uint8Array(chunks);
-        }
-        else if (typeof value === 'string') {
-          data = new TextEncoder().encode(value);
-        }
-        else {
-          throw 'Digest must be passed valid data type';
-        }
-
-        console.log('sha data', data, crypto.subtle)
-
-        console.log('crypto.subtle', crypto.subtle)
-
-        return hex(new DataView(await crypto.subtle.digest("SHA-256", data)))
-      }
-    })
+    unaryFuncs
   ]
 
   return async function(name: string, args: Array<PipableType> = []): Promise<PipableType> {
