@@ -38,7 +38,7 @@ export async function valueToUint8ArrayOrString(value: string | Uint8Array | Rea
     return value;
   }
   else {
-    throw 'Must be passed valid data type';
+    throw `Must be passed valid data type: ${typeof value} ${(value as any).constructor.name}`;
   }
 }
 
@@ -51,7 +51,7 @@ export async function valueToUint8Array(value: string | Uint8Array | ReadableStr
     return value;
   }
   else {
-    throw 'Must be passed valid data type';
+    throw `Must be passed valid data type: string or data not ${typeof value} ${(value as any).constructor.name}`;
   }
 }
 
