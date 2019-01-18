@@ -1,6 +1,7 @@
 import * as Digest from "./modules/Digest";
 import * as Store from "./modules/Store";
 import * as Markdown from "./modules/Markdown";
+import * as HTML from "./modules/HTML";
 
 type PipableType = string | number | Array<string> | Array<Array<string>> | Uint8Array | Response | ReadableStream | null;
 
@@ -75,6 +76,7 @@ const unaryFuncs = def1({
   'Store.addTextMarkdown': Store.addTextMarkdown,
   'Store.readTextMarkdown': Store.readTextMarkdown,
   'Markdown.toHTML': Markdown.toHTML,
+  'HTML.wrapInPage': HTML.wrapInPage,
 })
 
 export function makeRunner({ request }: { request: Request }) {
