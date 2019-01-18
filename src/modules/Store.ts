@@ -7,7 +7,8 @@ export async function readTextMarkdown(sha256: string) {
   const readURL = `${config.storage.baseURL}/1/storage/text/markdown/sha256/${sha256}`;
   return fetch(readURL, {
     cf: {
-      cacheTtlByStatus: { "200-299": cacheTimeSecs, 404: 1, "500-599": 0 }
+      cacheTtl: cacheTimeSecs,
+      // cacheTtlByStatus: { "200-299": cacheTimeSecs, 404: 1, "500-599": 0 }
     }
   } as RequestInit);
 }
