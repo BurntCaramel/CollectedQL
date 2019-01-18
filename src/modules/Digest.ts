@@ -1,3 +1,5 @@
+import { valueToUint8Array } from "./values";
+
 function hex(view: DataView): string {
   var hexCodes = [];
   for (var i = 0; i < view.byteLength; i += 4) {
@@ -15,43 +17,11 @@ function hex(view: DataView): string {
   return hexCodes.join("");
 }
 
-export async function sha256(value: string | ReadableStream | null): Promise<string> {
+export async function sha256(value: string | Uint8Array | ReadableStream | null): Promise<string> {
   if (!value) {
     throw 'Digest must be passed valid data type';
   }
 
-  let data: Uint8Array;
-
-  const stream = value as ReadableStream;
-  if (typeof stream.getReader === 'function') {
-    let chunks: Array<number> = []
-    const reader = (value as ReadableStream<number>).getReader()
-    await reader.read().then(function next({ done, value }): ReadableStreamReadResult<number> | Promise<ReadableStreamReadResult<number>> {
-      // Result objects contain two properties:
-      // done  - true if the stream has already given you all its data.
-      // value - some data. Always undefined when done is true.
-      if (done) {
-        return { done: true, value: 0 };
-      }
-
-      // value for fetch streams is a Uint8Array
-      chunks.push(value);
-
-      // Read some more, and call this function again
-      return reader.read().then(next);
-    });
-    data = new Uint8Array(chunks);
-  }
-  else if (typeof value === 'string') {
-    data = new TextEncoder().encode(value);
-  }
-  else {
-    throw 'Digest must be passed valid data type';
-  }
-
-  console.log('sha data', data, crypto.subtle)
-
-  console.log('crypto.subtle', crypto.subtle)
-
+  const data: Uint8Array = await valueToUint8Array(value);
   return hex(new DataView(await crypto.subtle.digest("SHA-256", data)))
 }

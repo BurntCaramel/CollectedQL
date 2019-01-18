@@ -1,6 +1,7 @@
 /// <reference types="node-webcrypto-ossl" />
 import "fast-text-encoding";
 import WebCrypto from "node-webcrypto-ossl";
+import 'cross-fetch/polyfill';
 
 interface Global {
   crypto: any;
@@ -32,32 +33,36 @@ describe("funcs", () => {
     expect(await run('"hello"')).toEqual('hello')
   });
 
-  it('parses an empty array with single string', async () => {
-    expect(await run('[]')).toEqual([])
+  describe('array', () => {
+    it('parses an empty array with single string', async () => {
+      expect(await run('[]')).toEqual([])
+    });
+  
+    it('parses an array with single string', async () => {
+      expect(await run('["hello"]')).toEqual(['hello'])
+    });
+  
+    it('parses an array with two strings', async () => {
+      expect(await run('["first","second"]')).toEqual(['first', 'second'])
+    });
+  
+    it('parses an array with three strings', async () => {
+      expect(await run('["first","second","third"]')).toEqual(['first', 'second', 'third'])
+    });
+    it('parses an array with three strings', async () => {
+      expect(await run('["fi,rst","sec,ond","thi,rd"]')).toEqual(['fi,rst', 'sec,ond', 'thi,rd'])
+    });
   });
 
-  it('parses an array with single string', async () => {
-    expect(await run('["hello"]')).toEqual(['hello'])
-  });
-
-  it('parses an array with two strings', async () => {
-    expect(await run('["first","second"]')).toEqual(['first', 'second'])
-  });
-
-  it('parses an array with three strings', async () => {
-    expect(await run('["first","second","third"]')).toEqual(['first', 'second', 'third'])
-  });
-  it('parses an array with three strings', async () => {
-    expect(await run('["fi,rst","sec,ond","thi,rd"]')).toEqual(['fi,rst', 'sec,ond', 'thi,rd'])
-  });
-
-  it('returns the SHA-256 in hex for "a"', async () => {
-    const crypto = new WebCrypto();
-    global.crypto = crypto;
-
-    const result = await run('sha256', ['a']);
-
-    expect(result).toEqual('ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb');
+  describe('Digest', () => {
+    it('returns the SHA-256 in hex for "a"', async () => {
+      const crypto = new WebCrypto();
+      global.crypto = crypto;
+  
+      const result = await run('sha256', ['a']);
+  
+      expect(result).toEqual('ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb');
+    });
   });
 
   it('throws an error', async () => {
@@ -86,5 +91,16 @@ describe("funcs", () => {
   
       expect(result).toEqual(404);
     });
-  })
+  });
+
+  describe('Markdown', () => {
+    it('returns html', async () => {
+      const result = await run('Markdown.toHTML', ['# Hello']) as Response;
+      // const body = result.body as ReadableStream<Uint8Array>
+      const body = result.body as unknown as string;
+  
+      expect(result).toBeInstanceOf(Response)
+      expect(body.trim()).toEqual("<h1 id=\"hello\">Hello</h1>");
+    });
+  });
 });
