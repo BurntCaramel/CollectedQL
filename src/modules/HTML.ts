@@ -10,7 +10,7 @@ const wrapHTML = (innerHTML: string) => `<!doctype html>
 }
 body {
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
-  max-width: 60rem;
+  max-width: 48rem;
   margin: auto;
   padding: 1rem;
 }
