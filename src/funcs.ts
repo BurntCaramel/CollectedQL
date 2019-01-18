@@ -1,4 +1,3 @@
-import { config } from "./config.secret";
 import * as Digest from "./modules/Digest";
 import * as Store from "./modules/Store";
 
@@ -19,7 +18,7 @@ function hex(view: DataView): string {
   return hexCodes.join("");
 }
 
-type PipableType = string | number | Response | ReadableStream | null | Array<Array<string>>;
+type PipableType = string | number | Array<string> | Array<Array<string>> | Response | ReadableStream | null;
 
 type NullaryDefinition = [string, () => PipableType] | [RegExp, (...args: Array<string>) => PipableType]
 
@@ -94,12 +93,18 @@ const unaryFuncs = def1({
 })
 
 export function makeRunner({ request }: { request: Request }) {
+  const nullaryFuncs = def0([
+    ['Viewer.ipAddress', () => request.headers.get('CF-Connecting-IP')],
+    ['Input.read', () => request.body],
+    [/^"(.*)"$/, (_, s) => s],
+    [/^\[\]$/, (_) => []],
+    [/^\[(.*)\]$/, (_, inner) => {
+      return inner.split(/\B,\B/).map(item => nullaryFuncs(item)() as string);
+    }],
+  ])
+
   const arityToFuncs: Array<((input: string) => (...args: Array<PipableType>) => PipableType | Promise<PipableType>)> = [
-    def0([
-      ['Viewer.ipAddress', () => request.headers.get('CF-Connecting-IP')],
-      ['Input.read', () => request.body],
-      [/^"(.*)"$/, (_ , s) => s],
-    ]),
+    nullaryFuncs,
     unaryFuncs
   ]
 

@@ -28,8 +28,27 @@ describe("funcs", () => {
     expect(await run('Viewer.ipAddress')).toEqual('1.2.3.4')
   });
 
-  it('returns a string', async () => {
+  it('parses a string', async () => {
     expect(await run('"hello"')).toEqual('hello')
+  });
+
+  it('parses an empty array with single string', async () => {
+    expect(await run('[]')).toEqual([])
+  });
+
+  it('parses an array with single string', async () => {
+    expect(await run('["hello"]')).toEqual(['hello'])
+  });
+
+  it('parses an array with two strings', async () => {
+    expect(await run('["first","second"]')).toEqual(['first', 'second'])
+  });
+
+  it('parses an array with three strings', async () => {
+    expect(await run('["first","second","third"]')).toEqual(['first', 'second', 'third'])
+  });
+  it('parses an array with three strings', async () => {
+    expect(await run('["fi,rst","sec,ond","thi,rd"]')).toEqual(['fi,rst', 'sec,ond', 'thi,rd'])
   });
 
   it('returns the SHA-256 in hex for "a"', async () => {
