@@ -9,7 +9,18 @@ interface JSONResponseInput {
 
 export async function handleRequest(request: Request): Promise<Response> {
   try {
-    return await handleRequestThrowing(request)
+    const start = Date.now();
+    const response = await handleRequestThrowing(request)
+    const duration = Date.now() - start;
+    console.log('duration', duration);
+
+    const wrappedHeaders = new Headers(response.headers);
+    wrappedHeaders.append("Server-Timing", `cfworker;dur=${duration}`);
+    const wrappedResponse = new Response(response.body, {
+      status: response.status,
+      headers: wrappedHeaders
+    });
+    return wrappedResponse
   }
   catch (error) {
     return jsonResponse({

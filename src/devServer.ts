@@ -2,8 +2,8 @@
 import "fast-text-encoding";
 import WebCrypto from "node-webcrypto-ossl";
 import 'cross-fetch/polyfill';
-import { Server, Util } from "hapi";
-import { handleRequestThrowing } from "./handlers";
+import { Server } from "hapi";
+import { handleRequest } from "./handlers";
 
 interface Global {
   crypto: any;
@@ -31,7 +31,7 @@ async function start(port: number): Promise<void> {
         },
         body: req.payload as string
       })
-      const fetchResponse = await handleRequestThrowing(incomingRequest);
+      const fetchResponse = await handleRequest(incomingRequest);
       const handlerResponse = h.response(fetchResponse.body as {});
 
       fetchResponse.headers.forEach((value, key) => {
