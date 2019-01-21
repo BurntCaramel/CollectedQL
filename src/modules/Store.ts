@@ -31,5 +31,9 @@ export async function addTextMarkdown(value: string | Uint8Array | ReadableStrea
     body: dataOrString
   });
   const uploadRes = await fetch(uploadReq);
-  return uploadRes.statusText + ' ' + sha256;
+  if (uploadRes.ok) {
+    return sha256;
+  }
+
+  throw "Could not upload to store";
 }
