@@ -4,6 +4,7 @@ const wrapHTML = (innerHTML: string) => `<!doctype html>
 <html>
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 * {
   box-sizing: border-box;
