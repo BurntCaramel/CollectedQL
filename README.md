@@ -1,6 +1,6 @@
-# Syrup: Simple APIs at the Edge
+# Syrup: Content management and processing at the Edge
 
-Store and work with content at the edge in a Cloudflare Worker.
+Store, present, and process content at the edge closest to your users with Cloudflare Workers.
 
 ## Features
 
