@@ -20,8 +20,11 @@ async function start(port: number): Promise<void> {
   });
 
   server.route({
-    "method": ["get", "post"],
-    "path": "/pipeline/1/{command*}",
+    method: ["get", "post"],
+    path: "/pipeline/1/{command*}",
+    options: {
+      cors: true,
+    },
     async handler(req, h) {
       const urlString = `https://example.org${req.url.href}`
       const incomingRequest = new Request(urlString, {
