@@ -1,5 +1,6 @@
 import { makeRunner } from './funcs'
 import { readTextMarkdown } from "./modules/Store"
+import * as GraphQLServer from "./GraphQLServer";
 
 interface JSONResponseInput {
   meta?: {},
@@ -38,7 +39,7 @@ function adjustedPath(path: string): string {
 function jsonResponse(json: JSONResponseInput): Response {
   return new Response(JSON.stringify(json, null, '  '), {
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json; charset=utf-8"
     }
   })
 }
@@ -46,6 +47,10 @@ function jsonResponse(json: JSONResponseInput): Response {
 export async function handleRequestThrowing(request: Request): Promise<Response> {
   const url = new URL(request.url);
   const path = adjustedPath(url.pathname);
+
+  if (/^\/graphql\/?/.test(path)) {
+    return GraphQLServer.handleRequest(request)
+  }
 
   if (/^\/1\/ac52804bd3751b1d55f3396059e47b2f20da3fe8a7318795f3b057600d33c3ed$/.test(path)) {
     return readTextMarkdown("ac52804bd3751b1d55f3396059e47b2f20da3fe8a7318795f3b057600d33c3ed")

@@ -8,7 +8,7 @@ provider "cloudflare" {
 
 resource "cloudflare_worker_script" "pipeline" {
   zone = "collected.systems"
-  content = "${file("../build/piping.umd.js")}"
+  content = "${file("../build/piping-post-processed.umd.js")}"
 }
 
 resource "cloudflare_worker_route" "collected-systems-pipeline" {

@@ -2,6 +2,7 @@ import * as Digest from "./modules/Digest";
 import * as Store from "./modules/Store";
 import * as Markdown from "./modules/Markdown";
 import * as HTML from "./modules/HTML";
+import * as GraphQL from "./modules/GraphQL";
 
 type PipableType = string | number | Array<string> | Array<Array<string>> | Uint8Array | Response | ReadableStream | null;
 
@@ -75,8 +76,11 @@ const unaryFuncs = def1({
   'Digest.sha256': Digest.sha256,
   'Store.addTextMarkdown': Store.addTextMarkdown,
   'Store.readTextMarkdown': Store.readTextMarkdown,
+  'Store.addTextGraphQLSchema': Store.addTextGraphQLSchema,
+  'Store.readTextGraphQLSchema': Store.readTextGraphQLSchema,
   'Markdown.toHTML': Markdown.toHTML,
   'HTML.wrapInPage': HTML.wrapInPage,
+  'GraphQL.buildSchema': GraphQL.buildSchema,
 })
 
 export function makeRunner({ request }: { request: Request }) {
