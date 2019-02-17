@@ -5,7 +5,7 @@ import {
 const schemaSource = `
 type Query {
   textMarkdownSHA256(sha256: String): ContentAddressedTextMarkdown
-  textMarkdownGitHub(owner: string, repo: string, path: string, branch: string): GitHubSourcedTextMarkdown
+  textMarkdownGitHub(owner: string, repo: string, branch: string, path: string): GitHubSourcedTextMarkdown
 }
 
 type ContentAddressedTextMarkdown {

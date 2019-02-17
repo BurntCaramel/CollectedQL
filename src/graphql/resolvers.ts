@@ -12,6 +12,24 @@ type FieldResolverFunc = (
   context: Context
 ) => any | Promise<any>;
 
+const TextMarkdownResolver = {
+  async text(
+    parent: string,
+    args: {},
+    context: Context
+  ): Promise<string | null> {
+    return parent;
+  },
+  async toHTML(
+    parent: string,
+    args: {},
+    context: Context
+  ): Promise<string | null> {
+    const htmlResponse = await Markdown.toHTML(parent);
+    return valueToString(htmlResponse);
+  }
+} as Record<string, FieldResolverFunc>
+
 const resolversMap = {
   Query: {
     async textMarkdownSHA256(
@@ -24,25 +42,22 @@ const resolversMap = {
         return null;
       }
       return valueToString(response.body);
-    }
-  } as Record<string, FieldResolverFunc>,
-  ContentAddressedTextMarkdown: {
-    async text(
-      parent: string,
-      args: {},
-      context: Context
-    ): Promise<string | null> {
-      return parent;
     },
-    async toHTML(
-      parent: string,
-      args: {},
+    async textMarkdownGitHub(
+      root: Root,
+      {owner, repo, branch, path}: Record<string, any>,
       context: Context
     ): Promise<string | null> {
-      const htmlResponse = await Markdown.toHTML(parent);
-      return valueToString(htmlResponse);
+      const url = `https://cdn.jsdelivr.net/gh/${owner}/${repo}@${branch}/${path}`
+      const response = await fetch(url);
+      if (!response.body) {
+        return null;
+      }
+      return valueToString(response.body);
     }
   } as Record<string, FieldResolverFunc>,
+  ContentAddressedTextMarkdown: TextMarkdownResolver,
+  GitHubSourcedTextMarkdown: TextMarkdownResolver,
   HTMLBuilder: {
     async html(
       parent: string,
