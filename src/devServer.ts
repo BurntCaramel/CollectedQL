@@ -1,6 +1,7 @@
 /// <reference types="node-webcrypto-ossl" />
 import "fast-text-encoding";
 import WebCrypto from "node-webcrypto-ossl";
+import { URL } from "whatwg-url";
 import 'cross-fetch/polyfill';
 import { Server } from "hapi";
 import { handleRequest } from "./handlers";
@@ -8,11 +9,15 @@ import { handleRequest } from "./handlers";
 interface Global {
   crypto: any;
   fetch: any;
+  URL: any;
 }
 declare const global: Global;
 
 const crypto = new WebCrypto();
 global.crypto = crypto;
+
+global.URL = URL;
+
 
 async function start(port: number): Promise<void> {
   const server = new Server({

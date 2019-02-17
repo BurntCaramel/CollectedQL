@@ -11,6 +11,7 @@
     "@types/node": "^10.12.18",
     "@types/puppeteer-core": "^1.9.0",
     "@types/text-encoding": "0.0.35",
+    "@types/whatwg-url": "^6.4.0",
     "cross-fetch": "^3.0.0",
     "fast-text-encoding": "^1.0.0",
     "hapi": "^17.8.1",
@@ -22,7 +23,8 @@
     "puppeteer-core": "^1.11.0",
     "ts-jest": "^23.10.5",
     "ts-node": "^7.0.1",
-    "typescript": "^3.2.2"
+    "typescript": "^3.2.2",
+    "whatwg-url": "^7.0.0"
   },
   "scripts": {
     "old-test": "node run-tests.js",
