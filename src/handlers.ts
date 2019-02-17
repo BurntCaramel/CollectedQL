@@ -1,6 +1,6 @@
 import { makeRunner } from './funcs'
 import { readTextMarkdown } from "./modules/Store"
-import * as GraphQLServer from "./GraphQLServer";
+import * as GraphQLServer from "./graphql/GraphQLServer";
 
 interface JSONResponseInput {
   meta?: {},
