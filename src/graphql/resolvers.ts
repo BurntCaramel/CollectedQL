@@ -12,6 +12,14 @@ type FieldResolverFunc = (
   context: Context
 ) => any | Promise<any>;
 
+async function fetchText(url: string): Promise<string | null> {
+  const response = await fetch(url);
+  if (!response.body) {
+    return null;
+  }
+  return valueToString(response.body);
+}
+
 const TextMarkdownResolver = {
   async text(
     parent: string,
@@ -45,17 +53,22 @@ const resolversMap = {
     },
     async textMarkdownGitHub(
       root: Root,
-      {owner, repo, branch, path}: Record<string, any>,
+      {owner, repoName, branch, path}: Record<string, any>,
       context: Context
     ): Promise<string | null> {
-      const url = `https://cdn.jsdelivr.net/gh/${owner}/${repo}@${branch}/${path}`
-      const response = await fetch(url);
-      if (!response.body) {
-        return null;
-      }
-      return valueToString(response.body);
+      const url = `https://cdn.jsdelivr.net/gh/${owner}/${repoName}@${branch}/${path}`
+      return fetchText(url);
+    },
+    gitHubRepoSource(root: Root, {owner, repoName, branch}: Record<string, any>) {
+      return { owner, repoName, branch };
     }
-  } as Record<string, FieldResolverFunc>,
+  },
+  GitHubRepoSource: {
+    textMarkdown({ owner, repoName, branch }: any, { path }: Record<string, any>, context: Context): Promise<string | null> {
+      const url = `https://cdn.jsdelivr.net/gh/${owner}/${repoName}@${branch}/${path}`
+      return fetchText(url);
+    }
+  },
   ContentAddressedTextMarkdown: TextMarkdownResolver,
   GitHubSourcedTextMarkdown: TextMarkdownResolver,
   HTMLBuilder: {
@@ -78,5 +91,15 @@ export function resolver(
   const fieldName = info.fieldName;
   const parentName = info.parentType.name;
   console.log("parentName", parentName);
-  return resolversMap[parentName][fieldName](source || info.rootValue, args, context);
+  if (resolversMap[parentName]) {
+    if (typeof resolversMap[parentName][fieldName] === "function") {
+      return resolversMap[parentName][fieldName](source || info.rootValue, args, context);
+    }
+  }
+
+  if (source) {
+    return source[fieldName];
+  }
+
+  return null;
 }

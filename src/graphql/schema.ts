@@ -5,7 +5,16 @@ import {
 const schemaSource = `
 type Query {
   textMarkdownSHA256(sha256: String): ContentAddressedTextMarkdown
-  textMarkdownGitHub(owner: String, repo: String, branch: String, path: String): GitHubSourcedTextMarkdown
+  textMarkdownGitHub(owner: String, repoName: String, branch: String, path: String): GitHubSourcedTextMarkdown
+
+  gitHubRepoSource(owner: String, repoName: String, branch: String): GitHubRepoSource
+}
+
+type GitHubRepoSource {
+  owner: String
+  repoName: String
+  branch: String
+  textMarkdown(path: String): GitHubSourcedTextMarkdown
 }
 
 type ContentAddressedTextMarkdown {
