@@ -77,14 +77,7 @@ const resolversMap = {
     lists({ lists, cards }: TrelloBoard) {
       return lists.map(list => ({
         ...list,
-        // cards: cards.filter(card => card.idList === list.id)
-        cards: function *() {
-          for (const card of cards) {
-            if (card.idList === list.id) {
-              yield card;
-            }
-          }
-        }
+        cards: cards.filter(card => card.idList === list.id)
       }));
     }
   },
@@ -95,8 +88,8 @@ const resolversMap = {
     boardID({ idBoard }: TrelloList) {
       return idBoard;
     },
-    cards({ cards }: { cards: () => IterableIterator<TrelloCard> }) {
-      return Array.from(cards());
+    cards({ cards }: { cards: Array<TrelloCard> }) {
+      return cards;
     }
   },
   TrelloBoardCard: {
