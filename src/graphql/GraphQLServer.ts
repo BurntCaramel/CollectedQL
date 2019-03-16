@@ -85,7 +85,8 @@ function jsonResponse(
   return new Response(JSON.stringify(json, null, "  "), {
     status: status,
     headers: {
-      "Content-Type": "application/json; charset=utf-8"
+      "Content-Type": "application/json; charset=utf-8",
+      "Access-Control-Allow-Origin": "*"
     }
   });
 }
