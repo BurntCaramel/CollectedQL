@@ -1,6 +1,7 @@
 import { makeRunner } from './funcs'
 import { readTextMarkdown } from "./modules/Store"
 import * as GraphQLServer from "./graphql/GraphQLServer";
+import { match } from "ramda";
 
 interface JSONResponseInput {
   meta?: {},
@@ -33,7 +34,8 @@ export async function handleRequest(request: Request): Promise<Response> {
 
 
 function adjustedPath(path: string): string {
-  return path.split('/pipeline')[1];
+  const [, suffix = ""] = match(/^\/1\/(.*)/, path);
+  return suffix;
 }
 
 function jsonResponse(json: JSONResponseInput): Response {
@@ -48,19 +50,19 @@ export async function handleRequestThrowing(request: Request): Promise<Response>
   const url = new URL(request.url);
   const path = adjustedPath(url.pathname);
 
-  if (/^\/graphql\/?/.test(path)) {
+  if (/^graphql\/?/.test(path)) {
     return GraphQLServer.handleRequest(request)
   }
 
-  if (/^\/1\/ac52804bd3751b1d55f3396059e47b2f20da3fe8a7318795f3b057600d33c3ed$/.test(path)) {
+  if (/^ac52804bd3751b1d55f3396059e47b2f20da3fe8a7318795f3b057600d33c3ed$/.test(path)) {
     return readTextMarkdown("ac52804bd3751b1d55f3396059e47b2f20da3fe8a7318795f3b057600d33c3ed")
   }
 
-  if (/^\/1\/ac52804bd3751b1d55f3396059e47b2f20da3fe8a7318795f3b057600d33c3ed\/redirect$/.test(path)) {
+  if (/^ac52804bd3751b1d55f3396059e47b2f20da3fe8a7318795f3b057600d33c3ed\/redirect$/.test(path)) {
     return Response.redirect("https://collected-193006.appspot.com/1/storage/text/markdown/sha256/ac52804bd3751b1d55f3396059e47b2f20da3fe8a7318795f3b057600d33c3ed")
   }
 
-  if (/^\/1\/ac52804bd3751b1d55f3396059e47b2f20da3fe8a7318795f3b057600d33c3ed\/hardcoded$/.test(path)) {
+  if (/^ac52804bd3751b1d55f3396059e47b2f20da3fe8a7318795f3b057600d33c3ed\/hardcoded$/.test(path)) {
     return new Response(
       "# Hello2", {
         headers: {
@@ -70,8 +72,8 @@ export async function handleRequestThrowing(request: Request): Promise<Response>
     )
   }
 
-  if (/^\/1\//.test(path)) {
-    const argsRaw = decodeURIComponent(path.substring(3))
+  if (/^-pipeline\//.test(path)) {
+    const argsRaw = decodeURIComponent(path.substring(10))
     const run = makeRunner({ request })
 
     const pipeline = argsRaw.split('|>')

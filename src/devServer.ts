@@ -40,7 +40,7 @@ async function handler(req: Hapi.Request, h: Hapi.ResponseToolkit) {
     return handlerResponse;
 }
 
-async function start(port: number): Promise<void> {
+export function makeServer({ port }: { port: number }): Hapi.Server {
   const server = new Hapi.Server({
     port
   });
@@ -48,7 +48,7 @@ async function start(port: number): Promise<void> {
   server.route([
     {
       method: ["get", "post"],
-      path: "/pipeline/1/{command*}",
+      path: "/1/-pipeline/{command*}",
       options: {
         cors: true,
       },
@@ -56,7 +56,7 @@ async function start(port: number): Promise<void> {
     },
     {
       method: ["get", "post"],
-      path: "/pipeline/graphql",
+      path: "/1/graphql",
       options: {
         cors: true,
       },
@@ -64,9 +64,15 @@ async function start(port: number): Promise<void> {
     }
   ]);
 
-  console.log('Starting server on port', port);
+  return server;
+}
+
+async function start(options: { port: number }): Promise<void> {
+  const server = makeServer(options);
+
+  console.log('Starting server on port', options.port);
 
   return server.start()
 }
 
-start(5533);
+start({ port: 5533 });
