@@ -61,6 +61,14 @@ export function makeServer({ port }: { port: number }): Hapi.Server {
         cors: true,
       },
       handler: handler
+    },
+    {
+      method: ["get"],
+      path: "/1/graphql/1.css",
+      options: {
+        cors: true,
+      },
+      handler: handler
     }
   ]);
 

@@ -1,6 +1,7 @@
 import { makeRunner } from './funcs'
 import { readTextMarkdown } from "./modules/Store"
 import * as GraphQLServer from "./graphql/GraphQLServer";
+import * as GraphQLCSSServer from "./graphql/GraphQLCSSServer";
 import { match } from "ramda";
 
 interface JSONResponseInput {
@@ -50,8 +51,12 @@ export async function handleRequestThrowing(request: Request): Promise<Response>
   const url = new URL(request.url);
   const path = adjustedPath(url.pathname);
 
-  if (/^graphql\/?/.test(path)) {
-    return GraphQLServer.handleRequest(request)
+  if (/^graphql\/?$/.test(path)) {
+    return GraphQLServer.handleRequest(request);
+  }
+
+  if (/^graphql\/1.css$/.test(path)) {
+    return GraphQLCSSServer.handleRequest(request);
   }
 
   if (/^ac52804bd3751b1d55f3396059e47b2f20da3fe8a7318795f3b057600d33c3ed$/.test(path)) {
