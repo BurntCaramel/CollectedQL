@@ -71,7 +71,7 @@ function cssResponse(
     status: status,
     headers: {
       "Content-Type": "text/css; charset=utf-8",
-      "Cache-Control": "public",
+      "Cache-Control": "public, max-age=31536000",
       "Access-Control-Allow-Origin": "*"
     }
   });
