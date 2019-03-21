@@ -162,6 +162,23 @@ const resolversMap = {
           }
         ]
       }));
+    },
+    backgroundClasses(
+      parent: { colors: Array<{ name: string; rgb: string }> },
+      { prefix }: Record<string, any>
+    ): Array<{
+      selector: string;
+      rules: Array<{ property: string; value: string }>;
+    }> {
+      return parent.colors.map(colorInput => ({
+        selector: `.${prefix}${colorInput.name}`,
+        rules: [
+          {
+            property: "background-color",
+            value: colorInput.rgb
+          }
+        ]
+      }));
     }
   },
   CSSBuilderSelector: {}

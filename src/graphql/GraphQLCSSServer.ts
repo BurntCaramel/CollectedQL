@@ -34,6 +34,7 @@ interface CSSData extends ExecutionResultDataDefault {
   buildCSS?: {
     colors: {
       textClasses: Array<CSSClass>;
+      backgroundClasses: Array<CSSClass>;
     };
   };
 }
@@ -43,11 +44,16 @@ function cssResponse(
   status: 200 | 400 | 500 = 200
 ): Response {
   console.log("CSS!");
-  
+
   const classes: Array<CSSClass> = [];
   if (!!result.data && !!result.data.buildCSS) {
     const colors = result.data.buildCSS.colors;
+
     colors.textClasses.forEach(cssClass => {
+      classes.push(cssClass);
+    });
+
+    colors.backgroundClasses.forEach(cssClass => {
       classes.push(cssClass);
     });
   }
@@ -65,6 +71,7 @@ function cssResponse(
     status: status,
     headers: {
       "Content-Type": "text/css; charset=utf-8",
+      "Cache-Control": "public",
       "Access-Control-Allow-Origin": "*"
     }
   });

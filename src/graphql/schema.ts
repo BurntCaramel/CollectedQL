@@ -87,6 +87,7 @@ type CSSBuilder {
 
 type CSSBuilderColors {
   textClasses(prefix: String!): [CSSBuilderSelector!]
+  backgroundClasses(prefix: String!): [CSSBuilderSelector!]
 }
 
 type CSSBuilderSelector {
