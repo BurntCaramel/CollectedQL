@@ -1,8 +1,8 @@
-import * as Store from "../modules/Store";
-import * as Markdown from "../modules/Markdown";
-import { valueToString } from "../modules/values";
+import * as Store from "../../modules/Store";
+import * as Markdown from "../../modules/Markdown";
+import { valueToString } from "../../modules/values";
 import { GraphQLResolveInfo } from "graphql/type/definition";
-import { TrelloBoard, TrelloList, TrelloCard } from "../modules/Trello";
+import { TrelloBoard, TrelloList, TrelloCard } from "../../modules/Trello";
 
 type Root = {};
 type Context = {};
@@ -58,6 +58,11 @@ const resolversMap = {
       const res = await fetch(url);
       const data = (await res.json()) as TrelloBoard;
       return data;
+    },
+    buildCSS() {
+      return {
+        value: true
+      };
     }
   },
   GitHubRepoSource: {
@@ -106,6 +111,7 @@ const resolversMap = {
   TrelloCardDescriptionMarkdown: TextMarkdownResolver,
   ContentAddressedTextMarkdown: TextMarkdownResolver,
   GitHubSourcedTextMarkdown: TextMarkdownResolver,
+  ///
   HTMLBuilder: {
     async html(
       parent: { html: string },
@@ -114,7 +120,40 @@ const resolversMap = {
     ): Promise<string | null> {
       return parent.html;
     }
-  }
+  },
+  ///
+  CSSBuilder: {
+    colors(
+      parent: {},
+      { input }: Record<string, any>
+    ): { colors: Array<{ name: string; rgb: string }> } {
+      return { colors: input.palette };
+    }
+  },
+  CSSBuilderColors: {
+    textClasses(
+      parent: { colors: Array<{ name: string; rgb: string }> },
+      { prefix }: Record<string, any>
+    ): Array<{
+      selector: string;
+      rules: Array<{ property: string; value: string }>;
+    }> {
+      console.log("textRules parent", parent);
+      return parent.colors.map(colorInput => ({
+        selector: `.${prefix}${colorInput.name}`,
+        rules: [
+          {
+            property: "color",
+            value: colorInput.rgb
+          }
+        ]
+      }));
+    }
+  },
+  CSSBuilderSelector: {}
+  // CSSBuilderRules: {
+
+  // }
 } as Record<string, Record<string, FieldResolverFunc>>;
 
 export function resolver(

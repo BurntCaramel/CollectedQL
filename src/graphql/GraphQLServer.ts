@@ -10,7 +10,7 @@ import {
   ExecutionResult,
   ExecutionResultDataDefault
 } from "graphql/execution/execute";
-import { resolver } from "./resolvers";
+import { resolver } from "./resolvers/index";
 import { schema } from "./schema";
 
 async function getQuery(request: Request): Promise<string> {
@@ -30,17 +30,30 @@ async function getQuery(request: Request): Promise<string> {
       const json = await request.json();
       return json["query"];
     } else {
-      throw `Unsupported content type: ${contentType}`;
+      throw `Unsupported query content type: ${contentType}`;
     }
   } else {
     throw "No query passed";
   }
 }
 
+async function getVariables(request: Request): Promise<Record<string, any> | null> {
+  const url = new URL(request.url);
+  if (url.searchParams.has("variables")) {
+    const encodedJSON = (url.searchParams.get("variables") as string).trim();
+    if (encodedJSON.length === 0) {
+      return null;
+    }
+    return JSON.parse(encodedJSON);
+  } else {
+    return null;
+  }
+}
+
 export async function handleRequest(request: Request): Promise<Response> {
   const url = new URL(request.url);
-  let query: string = await getQuery(request);
-  console.dir(query);
+  const query = await getQuery(request);
+  const variables = await getVariables(request);
 
   const source = new Source(query, "GraphQL request");
 
@@ -63,7 +76,7 @@ export async function handleRequest(request: Request): Promise<Response> {
     documentAST,
     {},
     {},
-    {},
+    variables,
     null,
     resolver
   );

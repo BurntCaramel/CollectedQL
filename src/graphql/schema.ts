@@ -13,6 +13,9 @@ type Query {
 
   gitHubRepoSource(owner: String, repoName: String, branch: String): GitHubRepoSource
   trelloBoardSource(boardID: String): TrelloBoardSource
+  #webPageSource(url: String): WebPageSource
+  httpsSource(host: String): HTTPSSource
+  buildCSS: CSSBuilder
 }
 
 # Collected Store
@@ -64,6 +67,58 @@ type TrelloBoardCard {
 type TrelloCardDescriptionMarkdown {
   text: String
   toHTML: HTMLBuilder
+}
+
+# CSS Builder
+
+input ColorPaletteInput {
+  name: String
+  rgb: String
+}
+
+input ColorsInput {
+  palette: [ColorPaletteInput]
+}
+
+type CSSBuilder {
+  colors(input: ColorsInput!): CSSBuilderColors
+}
+
+type CSSBuilderColors {
+  textClasses(prefix: String!): [CSSBuilderSelector!]
+}
+
+type CSSBuilderSelector {
+  selector: String!
+  rules: [CSSBuilderRules!]
+}
+
+type CSSBuilderRules {
+  property: String!
+  value: String!
+}
+
+# HTTPS
+
+type HTTPSSource {
+  request(path: String): HTTPSRequest
+}
+
+type HTTPSRequest {
+  response: HTTPSResponse
+}
+
+type HTTPSResponse {
+  headers: HTTPSResponseHeaders
+}
+
+type HTTPSResponseHeaders {
+  all: [HTTPSResponseHeaderKeyValuePair!]
+}
+
+type HTTPSResponseHeaderKeyValuePair {
+  name: String!
+  value: String!
 }
 `;
 export const schema = buildSchema(schemaSource);
