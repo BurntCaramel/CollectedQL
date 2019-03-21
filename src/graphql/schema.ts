@@ -78,6 +78,7 @@ input ColorPaletteInput {
 
 input ColorsInput {
   palette: [ColorPaletteInput]
+  tailwindCSSVersion: String
 }
 
 type CSSBuilder {

@@ -15,7 +15,7 @@ export async function handleRequest(request: Request): Promise<Response> {
     const start = Date.now();
     const response = await handleRequestThrowing(request)
     const duration = Date.now() - start;
-    console.log('duration', duration);
+    console.log('duration', duration, "ms");
 
     const wrappedHeaders = new Headers(response.headers);
     wrappedHeaders.append("Server-Timing", `cfworker;dur=${duration}`);

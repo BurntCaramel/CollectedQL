@@ -1,8 +1,8 @@
 import * as Store from "../../modules/Store";
 import * as Markdown from "../../modules/Markdown";
-import { valueToString } from "../../modules/values";
 import { GraphQLResolveInfo } from "graphql/type/definition";
 import { TrelloBoard, TrelloList, TrelloCard } from "../../modules/Trello";
+import { makeColorPalette as tailwindColorPalette } from "../../designTokens/tailwind";
 
 type Root = {};
 type Context = {};
@@ -127,7 +127,22 @@ const resolversMap = {
       parent: {},
       { input }: Record<string, any>
     ): { colors: Array<{ name: string; rgb: string }> } {
-      return { colors: input.palette };
+      const colorsInput = input as {
+        palette?: Array<{ name: string, rgb: string }>,
+        tailwindCSSVersion?: string
+      }
+
+      let colors: Array<{ name: string, rgb: string }> = [];
+      
+      if (colorsInput.palette) {
+        colors = colors.concat(colorsInput.palette);
+      }
+
+      if (colorsInput.tailwindCSSVersion === "1.0") {
+        colors = colors.concat(tailwindColorPalette())
+      }
+
+      return { colors };
     }
   },
   CSSBuilderColors: {
@@ -138,7 +153,6 @@ const resolversMap = {
       selector: string;
       rules: Array<{ property: string; value: string }>;
     }> {
-      console.log("textRules parent", parent);
       return parent.colors.map(colorInput => ({
         selector: `.${prefix}${colorInput.name}`,
         rules: [
@@ -164,7 +178,7 @@ export function resolver(
 ) {
   const fieldName = info.fieldName;
   const parentName = info.parentType.name;
-  console.log("parentName", parentName);
+  // console.log("parentName", parentName);
   if (resolversMap[parentName]) {
     if (typeof resolversMap[parentName][fieldName] === "function") {
       return resolversMap[parentName][fieldName](
