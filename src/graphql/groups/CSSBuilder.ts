@@ -3,7 +3,7 @@ import { makeColorPalette as tailwindColorPalette } from "../../designTokens/tai
 
 export const queryFields = `
 buildCSS: CSSBuilder
-`
+`;
 
 export const schemaSource = `
 input ColorPaletteInput {
@@ -18,9 +18,11 @@ input ColorsInput {
 
 type CSSBuilder {
   colors(input: ColorsInput!): CSSBuilderColors
+  # colors(input: ColorsInput!, responsive: Boolean): CSSBuilderColors
 }
 
 type CSSBuilderColors {
+  # mediaQuery: CSSBuilderMedaiQuery
   textClasses(prefix: String!): [CSSBuilderSelector!]
   backgroundClasses(prefix: String!): [CSSBuilderSelector!]
 }
@@ -34,7 +36,15 @@ type CSSBuilderRules {
   property: String!
   value: String!
 }
-`
+`;
+
+const responsiveMediaQueries = {
+  "xs": null,
+  "sm": "min-width: 576px",
+  "md": "min-width: 768px",
+  "lg": "min-width: 992px",
+  "xl": "min-width: 1200px",
+}
 
 export const resolversMap = {
   CSSBuilder: {
@@ -43,18 +53,18 @@ export const resolversMap = {
       { input }: Record<string, any>
     ): { colors: Array<{ name: string; rgb: string }> } {
       const colorsInput = input as {
-        palette?: Array<{ name: string, rgb: string }>,
-        tailwindCSSVersion?: string
-      }
+        palette?: Array<{ name: string; rgb: string }>;
+        tailwindCSSVersion?: string;
+      };
 
-      let colors: Array<{ name: string, rgb: string }> = [];
-      
+      let colors: Array<{ name: string; rgb: string }> = [];
+
       if (colorsInput.palette) {
         colors = colors.concat(colorsInput.palette);
       }
 
       if (colorsInput.tailwindCSSVersion === "1.0") {
-        colors = colors.concat(tailwindColorPalette())
+        colors = colors.concat(tailwindColorPalette());
       }
 
       return { colors };
