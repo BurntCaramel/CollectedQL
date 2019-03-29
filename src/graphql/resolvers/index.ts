@@ -2,16 +2,8 @@ import * as Store from "../../modules/Store";
 import * as Markdown from "../../modules/Markdown";
 import { GraphQLResolveInfo } from "graphql/type/definition";
 import { TrelloBoard, TrelloList, TrelloCard } from "../../modules/Trello";
-import { makeColorPalette as tailwindColorPalette } from "../../designTokens/tailwind";
-
-type Root = {};
-type Context = {};
-
-type FieldResolverFunc = (
-  root: Root | any,
-  args: Record<string, any>,
-  context: Context
-) => any | Promise<any>;
+import { FieldResolverFunc, Context, Root } from "./types";
+import { resolversMap as cssResolversMap } from "../groups/CSSBuilder";
 
 async function fetchText(url: string): Promise<string> {
   const response = await fetch(url);
@@ -121,70 +113,7 @@ const resolversMap = {
       return parent.html;
     }
   },
-  ///
-  CSSBuilder: {
-    colors(
-      parent: {},
-      { input }: Record<string, any>
-    ): { colors: Array<{ name: string; rgb: string }> } {
-      const colorsInput = input as {
-        palette?: Array<{ name: string, rgb: string }>,
-        tailwindCSSVersion?: string
-      }
-
-      let colors: Array<{ name: string, rgb: string }> = [];
-      
-      if (colorsInput.palette) {
-        colors = colors.concat(colorsInput.palette);
-      }
-
-      if (colorsInput.tailwindCSSVersion === "1.0") {
-        colors = colors.concat(tailwindColorPalette())
-      }
-
-      return { colors };
-    }
-  },
-  CSSBuilderColors: {
-    textClasses(
-      parent: { colors: Array<{ name: string; rgb: string }> },
-      { prefix }: Record<string, any>
-    ): Array<{
-      selector: string;
-      rules: Array<{ property: string; value: string }>;
-    }> {
-      return parent.colors.map(colorInput => ({
-        selector: `.${prefix}${colorInput.name}`,
-        rules: [
-          {
-            property: "color",
-            value: colorInput.rgb
-          }
-        ]
-      }));
-    },
-    backgroundClasses(
-      parent: { colors: Array<{ name: string; rgb: string }> },
-      { prefix }: Record<string, any>
-    ): Array<{
-      selector: string;
-      rules: Array<{ property: string; value: string }>;
-    }> {
-      return parent.colors.map(colorInput => ({
-        selector: `.${prefix}${colorInput.name}`,
-        rules: [
-          {
-            property: "background-color",
-            value: colorInput.rgb
-          }
-        ]
-      }));
-    }
-  },
-  CSSBuilderSelector: {}
-  // CSSBuilderRules: {
-
-  // }
+  ...cssResolversMap
 } as Record<string, Record<string, FieldResolverFunc>>;
 
 export function resolver(

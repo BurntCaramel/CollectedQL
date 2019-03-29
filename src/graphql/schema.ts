@@ -1,6 +1,9 @@
+import { buildSchema } from "graphql";
+
 import {
-  buildSchema,
-} from "graphql";
+  schemaSource as cssSchemaSource,
+  queryFields as cssQueryFields
+} from "./groups/CSSBuilder";
 
 const schemaSource = `
 type HTMLBuilder {
@@ -15,7 +18,7 @@ type Query {
   trelloBoardSource(boardID: String): TrelloBoardSource
   #webPageSource(url: String): WebPageSource
   httpsSource(host: String): HTTPSSource
-  buildCSS: CSSBuilder
+  ${cssQueryFields}
 }
 
 # Collected Store
@@ -69,36 +72,7 @@ type TrelloCardDescriptionMarkdown {
   toHTML: HTMLBuilder
 }
 
-# CSS Builder
-
-input ColorPaletteInput {
-  name: String
-  rgb: String
-}
-
-input ColorsInput {
-  palette: [ColorPaletteInput]
-  tailwindCSSVersion: String
-}
-
-type CSSBuilder {
-  colors(input: ColorsInput!): CSSBuilderColors
-}
-
-type CSSBuilderColors {
-  textClasses(prefix: String!): [CSSBuilderSelector!]
-  backgroundClasses(prefix: String!): [CSSBuilderSelector!]
-}
-
-type CSSBuilderSelector {
-  selector: String!
-  rules: [CSSBuilderRules!]
-}
-
-type CSSBuilderRules {
-  property: String!
-  value: String!
-}
+${cssSchemaSource}
 
 # HTTPS
 
