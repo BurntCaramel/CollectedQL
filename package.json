@@ -28,13 +28,14 @@
     "puppeteer-core": "^1.11.0",
     "ts-jest": "^23.10.5",
     "ts-node": "^7.0.1",
+    "ts-node-dev": "^1.0.0-pre.32",
     "typescript": "^3.3.3",
     "whatwg-url": "^7.0.0"
   },
   "scripts": {
     "old-test": "node run-tests.js",
     "test": "jest",
-    "dev": "ts-node --project ./tsconfig.server.json src/devServer.ts"
+    "dev": "ts-node-dev --project ./tsconfig.server.json src/devServer.ts"
   },
   "author": "",
   "license": "MIT"
