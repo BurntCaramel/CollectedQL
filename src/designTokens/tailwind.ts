@@ -1,4 +1,4 @@
-import { ColorPalette } from "./types";
+import { ColorPalette, TextSize } from "./types";
 
 const defaultTheme = {
   colors: {
@@ -117,6 +117,17 @@ const defaultTheme = {
       800: "#97266d",
       900: "#702459"
     }
+  },
+  textSizes: {
+    xs: ".75rem", // 12px
+    sm: ".875rem", // 14px
+    base: "1rem", // 16px
+    lg: "1.125rem", // 18px
+    xl: "1.25rem", // 20px
+    "2xl": "1.5rem", // 24px
+    "3xl": "1.875rem", // 30px
+    "4xl": "2.25rem", // 36px
+    "5xl": "3rem" // 48px
   }
 };
 
@@ -175,4 +186,13 @@ export function makeColorPalette(): Array<ColorPalette> {
   });
 
   return out;
+}
+
+export function makeTextSizes(): Array<TextSize> {
+  return (Object.keys(defaultTheme.textSizes) as Array<
+    keyof typeof defaultTheme.textSizes
+  >).map(name => {
+    const cssValue = defaultTheme.textSizes[name];
+    return { name, cssValue };
+  });
 }
