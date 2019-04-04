@@ -6,23 +6,15 @@ provider "cloudflare" {
   token = "${var.cloudflare_token}"
 }
 
-resource "cloudflare_worker_script" "pipeline" {
+resource "cloudflare_worker_script" "api1" {
   zone = "collected.systems"
-  content = "${file("../build/piping-post-processed.umd.js")}"
+  content = "${file("../build/collectedql-post-processed.umd.js")}"
 }
 
-resource "cloudflare_worker_route" "collected-systems-pipeline" {
+resource "cloudflare_worker_route" "collected-systems-api1" {
   zone = "collected.systems"
-  pattern = "collected.systems/pipeline/*"
+  pattern = "collected.systems/1/*"
   enabled = true
 
-  depends_on = ["cloudflare_worker_script.pipeline"]
-}
-
-resource "cloudflare_worker_route" "www-collected-systems-pipeline" {
-  zone = "collected.systems"
-  pattern = "www.collected.systems/pipeline/*"
-  enabled = true
-
-  depends_on = ["cloudflare_worker_script.pipeline"]
+  depends_on = ["cloudflare_worker_script.api1"]
 }
