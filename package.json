@@ -4,6 +4,7 @@
   "description": "",
   "main": "run-tests.js",
   "dependencies": {
+    "graphql": "^14.2.1",
     "ramda": "^0.26.1"
   },
   "devDependencies": {
@@ -18,7 +19,6 @@
     "@types/whatwg-url": "^6.4.0",
     "cross-fetch": "^3.0.0",
     "fast-text-encoding": "^1.0.0",
-    "graphql": "^14.1.1",
     "hapi": "^17.8.1",
     "jest": "^23.6.0",
     "jest-puppeteer": "^3.7.0",
