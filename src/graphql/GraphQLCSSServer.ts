@@ -1,12 +1,14 @@
-import { executeRequest } from "./executeRequest";
+import { executeWithQuery } from "./executeRequest";
 import { errorsResponse } from "./response";
 import {
   ExecutionResultDataDefault,
   ExecutionResult
 } from "graphql/execution/execute";
+import { queryAndVariablesFromSource, GraphQLRequestSource } from "./source";
 
-export async function handleRequest(request: Request): Promise<Response> {
-  const executeResult = await executeRequest(request);
+export async function handleRequestFromSource(source: GraphQLRequestSource): Promise<Response> {
+  const { query, variables } = await queryAndVariablesFromSource(source);
+  const executeResult = await executeWithQuery(query, variables);
   if (executeResult.type === "invalidRequest") {
     return errorsResponse(400, executeResult.errors);
   }

@@ -1,8 +1,10 @@
-import { executeRequest } from "./executeRequest";
+import { ExecuteResult, executeWithQuery } from "./executeRequest";
 import { jsonResponse, errorsResponse } from "./response";
+import { GraphQLRequestSource, queryAndVariablesFromSource } from "./source";
 
-export async function handleRequest(request: Request): Promise<Response> {
-  const executeResult = await executeRequest(request);
+export async function jsonHandler(
+  executeResult: ExecuteResult
+): Promise<Response> {
   if (executeResult.type === "invalidRequest") {
     return errorsResponse(400, executeResult.errors);
   }
@@ -16,4 +18,10 @@ export async function handleRequest(request: Request): Promise<Response> {
   }
 
   return jsonResponse(result, status);
+}
+
+export async function handleRequestFromSource(source: GraphQLRequestSource): Promise<Response> {
+  const { query, variables } = await queryAndVariablesFromSource(source);
+  const executeResult = await executeWithQuery(query, variables);
+  return jsonHandler(executeResult);
 }
