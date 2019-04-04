@@ -54,14 +54,14 @@ export async function handleRequestThrowing(
   const path = adjustedPath(url.pathname);
 
   console.log("path", path);
-  if (/^(graphql|graphql\/.+)$/.test(path)) {
+  if (/^(graphql|graphql\.css)(\/?|\/.+)$/.test(path)) {
     const all = match(
-      /^(graphql|graphql\/1\.css)(?:(?:\/(github.com)\/([^\/]+)\/([^\/]+)\/([^\/]+))|[])$/,
+      /^(graphql|graphql\.css)(?:(?:\/(github.com)\/([^\/]+)\/([^\/]+)\/([^\/]+))|)$/,
       path
     ) as Array<string>;
     const [, type, sourceName, ...params] = all as [
       string,
-      "graphql" | "graphql/1.css",
+      "graphql" | "graphql.css",
       "github.com" | undefined,
       ...Array<string>
     ];
@@ -81,7 +81,7 @@ export async function handleRequestThrowing(
 
     if (type === "graphql") {
       return GraphQLServer.handleRequestFromSource(source);
-    } else if (type === "graphql/1.css") {
+    } else if (type === "graphql.css") {
       return GraphQLCSSServer.handleRequestFromSource(source);
     }
   }

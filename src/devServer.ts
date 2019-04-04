@@ -72,7 +72,7 @@ export function makeServer({ port }: { port: number }): Hapi.Server {
     },
     {
       method: ["get"],
-      path: "/1/graphql/1.css",
+      path: "/1/graphql.css",
       options: {
         cors: true,
       },
@@ -80,7 +80,7 @@ export function makeServer({ port }: { port: number }): Hapi.Server {
     },
     {
       method: ["get"],
-      path: "/1/graphql/1.css/{extra*}",
+      path: "/1/graphql.css/{extra*}",
       options: {
         cors: true,
       },
