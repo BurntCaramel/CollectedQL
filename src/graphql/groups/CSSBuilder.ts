@@ -25,30 +25,35 @@ input TextSizeInput {
 }
 
 input TypographyInput {
-  palette: [TextSizeInput]
+  sizes: [TextSizeInput]
   tailwindCSSVersion: String
 }
 
 type CSSBuilder {
-  colors(input: ColorsInput!): CSSBuilderColors
-  # colors(input: ColorsInput!, responsive: Boolean): CSSBuilderColors
-  typography(input: TypographyInput!): CSSBuilderTypography
+  colors(input: ColorsInput!, responsive: Boolean): [CSSBuilderColors]
+  typography(input: TypographyInput!, responsive: Boolean): [CSSBuilderTypography]
 }
 
 type CSSBuilderColors {
-  # mediaQuery: CSSBuilderMediaQuery
+  breakpoint: String
+  mediaQuery: CSSBuilderMediaQuery
   textClasses(prefix: String!): [CSSBuilderSelector!]
   backgroundClasses(prefix: String!): [CSSBuilderSelector!]
 }
 
 type CSSBuilderTypography {
-  # mediaQuery: CSSBuilderMediaQuery
+  breakpoint: String
+  mediaQuery: CSSBuilderMediaQuery
   sizeClasses(prefix: String!): [CSSBuilderSelector!]
   lineHeightClasses(prefix: String!): [CSSBuilderSelector!]
   familyClasses(prefix: String!): [CSSBuilderSelector!]
   weightClasses(prefix: String!): [CSSBuilderSelector!]
   italicClasses(prefix: String!): [CSSBuilderSelector!]
   decorationClasses(prefix: String!): [CSSBuilderSelector!]
+}
+
+type CSSBuilderMediaQuery {
+  raw: String
 }
 
 type CSSBuilderSelector {
@@ -75,12 +80,38 @@ const responsiveMediaQueries = {
   xl: "min-width: 1200px"
 };
 
+interface CSSBuilderColorBase {
+  breakpoint: string | null;
+  colors: Array<{ name: string; rgb: string }>;
+}
+
+interface CSSBuilderTypographyBase {
+  breakpoint: string | null;
+  sizes: Array<{ name: string; cssValue: string }>;
+}
+
+const reusableResolvers = {
+  mediaQuery(parent: { breakpoint: string | null }): { raw: string } | null {
+    if (parent.breakpoint == null) {
+      return null;
+    }
+
+    const raw = (responsiveMediaQueries as Record<string, string | null>)[
+      parent.breakpoint
+    ];
+    if (raw == null) {
+      return null;
+    }
+    return { raw };
+  },
+}
+
 export const resolversMap = {
   CSSBuilder: {
     colors(
       parent: {},
-      { input }: Record<string, any>
-    ): { colors: Array<{ name: string; rgb: string }> } {
+      { input, responsive }: Record<string, any>
+    ): Array<CSSBuilderColorBase> {
       const colorsInput = input as {
         palette?: Array<{ name: string; rgb: string }>;
         tailwindCSSVersion?: string;
@@ -96,37 +127,74 @@ export const resolversMap = {
         colors = colors.concat(tailwindColorPalette());
       }
 
-      return { colors };
+      if (responsive) {
+        return Object.keys(responsiveMediaQueries).map(breakpoint => ({
+          breakpoint: (responsiveMediaQueries as Record<string, string | null>)[
+            breakpoint
+          ]
+            ? breakpoint
+            : null,
+          colors
+        }));
+      } else {
+        return [
+          {
+            breakpoint: null,
+            colors
+          }
+        ];
+      }
     },
     typography(
       parent: {},
-      { input }: Record<string, any>
-    ): { sizes: Array<{ name: string; cssValue: string }> } {
+      { input, responsive }: Record<string, any>
+    ): Array<CSSBuilderTypographyBase> {
       const typographyInput = input as {
-        palette?: Array<{ name: string; cssValue: string }>;
+        sizes?: Array<{ name: string; cssValue: string }>;
         tailwindCSSVersion?: string;
       };
 
       let sizes: Array<{ name: string; cssValue: string }> = [];
 
-      if (typographyInput.palette) {
-        sizes = sizes.concat(typographyInput.palette);
+      if (typographyInput.sizes) {
+        sizes = sizes.concat(typographyInput.sizes);
       }
 
       if (typographyInput.tailwindCSSVersion === "1.0") {
         sizes = sizes.concat(tailwindTextSizes());
       }
 
-      return { sizes };
+      if (responsive) {
+        return Object.keys(responsiveMediaQueries).map(breakpoint => ({
+          breakpoint: (responsiveMediaQueries as Record<string, string | null>)[
+            breakpoint
+          ]
+            ? breakpoint
+            : null,
+          sizes
+        }));
+      } else {
+        return [
+          {
+            breakpoint: null,
+            sizes
+          }
+        ];
+      }
     }
   },
   CSSBuilderColors: {
+    mediaQuery: reusableResolvers.mediaQuery,
     textClasses(
-      parent: { colors: Array<{ name: string; rgb: string }> },
+      parent: CSSBuilderColorBase,
       { prefix }: Record<string, any>
     ): Array<CSSBuilderSelector> {
+      const breakpointPrefix = parent.breakpoint
+        ? `${parent.breakpoint}\\:`
+        : "";
+
       return parent.colors.map(colorInput => ({
-        selector: `.${prefix}${colorInput.name}`,
+        selector: `.${breakpointPrefix}${prefix}${colorInput.name}`,
         rules: [
           {
             property: "color",
@@ -136,11 +204,15 @@ export const resolversMap = {
       }));
     },
     backgroundClasses(
-      parent: { colors: Array<{ name: string; rgb: string }> },
+      parent: CSSBuilderColorBase,
       { prefix }: Record<string, any>
     ): Array<CSSBuilderSelector> {
+      const breakpointPrefix = parent.breakpoint
+        ? `${parent.breakpoint}\\:`
+        : "";
+
       return parent.colors.map(colorInput => ({
-        selector: `.${prefix}${colorInput.name}`,
+        selector: `.${breakpointPrefix}${prefix}${colorInput.name}`,
         rules: [
           {
             property: "background-color",
@@ -151,8 +223,9 @@ export const resolversMap = {
     }
   },
   CSSBuilderTypography: {
+    mediaQuery: reusableResolvers.mediaQuery,
     sizeClasses(
-      parent: { sizes: Array<{ name: string; cssValue: string }> },
+      parent: CSSBuilderTypographyBase,
       { prefix }: Record<string, any>
     ): Array<CSSBuilderSelector> {
       return parent.sizes.map(sizeInput => ({

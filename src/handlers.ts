@@ -53,7 +53,6 @@ export async function handleRequestThrowing(
   const url = new URL(request.url);
   const path = adjustedPath(url.pathname);
 
-  console.log("path", path);
   if (/^(graphql|graphql\.css)(\/?|\/.+)$/.test(path)) {
     const all = match(
       /^(graphql|graphql\.css)(?:(?:\/(github.com)\/([^\/]+)\/([^\/]+)\/([^\/]+))|)$/,
@@ -65,7 +64,6 @@ export async function handleRequestThrowing(
       "github.com" | undefined,
       ...Array<string>
     ];
-    console.log(all, { type, sourceName, params, queryParams: url.searchParams });
 
     let source: GraphQLRequestSource;
     if (sourceName === "github.com") {

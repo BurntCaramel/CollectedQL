@@ -25,6 +25,7 @@
     "marked": "^0.6.0",
     "microbundle": "^0.9.0",
     "node-webcrypto-ossl": "^1.0.39",
+    "prettier": "^1.16.4",
     "puppeteer-core": "^1.11.0",
     "ts-jest": "^23.10.5",
     "ts-node": "^7.0.1",
@@ -35,7 +36,7 @@
   "scripts": {
     "old-test": "node run-tests.js",
     "test": "jest",
-    "dev": "ts-node-dev --project ./tsconfig.server.json src/devServer.ts"
+    "dev": "ts-node-dev --project ./tsconfig.server.json src/dev.ts"
   },
   "author": "",
   "license": "MIT"

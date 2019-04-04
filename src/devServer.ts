@@ -91,12 +91,10 @@ export function makeServer({ port }: { port: number }): Hapi.Server {
   return server;
 }
 
-async function start(options: { port: number }): Promise<void> {
+export async function start(options: { port: number }): Promise<void> {
   const server = makeServer(options);
 
   console.log('Starting server on port', options.port);
 
   return server.start()
 }
-
-start({ port: 5533 });
