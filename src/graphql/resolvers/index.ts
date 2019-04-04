@@ -63,7 +63,8 @@ const resolversMap = {
       { path }: Record<string, any>,
       context: Context
     ): Promise<TextMarkdownObject | null> {
-      const url = `https://cdn.jsdelivr.net/gh/${owner}/${repoName}@${branch}/${path}`;
+      const pathString = (path as Array<string>).join("");
+      const url = `https://cdn.jsdelivr.net/gh/${owner}/${repoName}@${branch}/${pathString}`;
       return { text: await fetchText(url) };
     }
   },

@@ -33,7 +33,7 @@ type GitHubRepoSource {
   repoName: String
   branch: String
 
-  textMarkdown(path: String): GitHubSourcedTextMarkdown
+  textMarkdown(path: [String!]!): GitHubSourcedTextMarkdown
   #javascript(path: String): GitHubSourcedJavaScript
 }
 
