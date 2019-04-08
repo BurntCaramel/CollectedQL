@@ -228,8 +228,12 @@ export const resolversMap = {
       parent: CSSBuilderTypographyBase,
       { prefix }: Record<string, any>
     ): Array<CSSBuilderSelector> {
+      const breakpointPrefix = parent.breakpoint
+        ? `${parent.breakpoint}\\:`
+        : "";
+
       return parent.sizes.map(sizeInput => ({
-        selector: `.${prefix}${sizeInput.name}`,
+        selector: `.${breakpointPrefix}${prefix}${sizeInput.name}`,
         rules: [
           {
             property: "font-size",
