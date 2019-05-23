@@ -8,7 +8,7 @@
     "ramda": "^0.26.1"
   },
   "devDependencies": {
-    "@types/graphql": "^14.0.7",
+    "@types/graphql": "^14.2.0",
     "@types/hapi": "^17.8.2",
     "@types/jest": "^23.3.12",
     "@types/marked": "^0.6.0",
