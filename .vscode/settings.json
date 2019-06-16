@@ -1,7 +1,7 @@
 {
   "workbench.colorCustomizations": {
-    "sideBar.background": "#1d0038",
     "tab.activeBackground": "#38006d",
+    "tab.activeForeground": "#fff",
     "titleBar.activeBackground": "#553955" // change this color!
   }
 }
