@@ -6,6 +6,8 @@ import * as GraphQLServer from "./graphql/GraphQLServer";
 import * as GraphQLCSSServer from "./graphql/GraphQLCSSServer";
 import { GraphQLRequestSource } from "./graphql/source";
 import { fetchTextFromGitHub } from "./sources/gitHub";
+import { parseSVGDocument, listAllFillsFromSVGDocument } from "./modules/SVG";
+import { string } from "joi";
 
 interface JSONResponseInput {
   meta?: {};
@@ -73,6 +75,48 @@ export async function handleRequestThrowing(
     let contentType = "text/plain";
     if (/\.svg$/.test(githubPath)) {
       contentType = "image/svg+xml";
+
+      if (url.searchParams.has("query")) {
+        const query = url.searchParams.get("query");
+        if (query === "listFills") {
+          const svg = parseSVGDocument(text);
+          const fills = listAllFillsFromSVGDocument(svg);
+          const uniqueFills = new Set(fills);
+          return jsonResponse({ data: Array.from(uniqueFills) });
+        } else {
+          return jsonResponse({ data: null });
+        }
+      }
+
+      const newFill = url.searchParams.get("fill");
+      if (newFill !== null) {
+        text = text.replace(/<\/svg>/, input => {
+          return `<style>[fill] { fill: ${newFill}; }</style>${input}`;
+        });
+      }
+
+      const fillReplacements = new Map<string, string>();
+      url.searchParams.forEach((value, key) => {
+        const [, findColor] = match(/^fill\[(.+)\]$/, key);
+        if (findColor !== undefined) {
+          fillReplacements.set(findColor, value);
+        }
+      });
+
+      if (fillReplacements.size > 0) {
+        text = text.replace(/<\/svg>/, input => {
+          const rules: Array<string> = [];
+
+          fillReplacements.forEach((value, key) => {
+            rules.push(`[fill="${key}"i] { fill: ${value}; }`);
+          });
+
+          return `<style>
+${rules.join("\n")}
+</style>
+${input}`;
+        });
+      }
     }
 
     return new Response(text, {
