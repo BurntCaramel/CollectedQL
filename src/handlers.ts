@@ -5,6 +5,7 @@ import { readTextMarkdown } from "./modules/Store";
 import * as GraphQLServer from "./graphql/GraphQLServer";
 import * as GraphQLCSSServer from "./graphql/GraphQLCSSServer";
 import { GraphQLRequestSource } from "./graphql/source";
+import { fetchTextFromGitHub } from "./sources/gitHub";
 
 interface JSONResponseInput {
   meta?: {};
@@ -52,6 +53,34 @@ export async function handleRequestThrowing(
 ): Promise<Response> {
   const url = new URL(request.url);
   const path = adjustedPath(url.pathname);
+
+  console.log({ path });
+
+  if (/^github\/.+$/.test(path)) {
+    const all = match(
+      /^github\/([^\/]+)\/([^\/]+)\/([^\/]+)\/(.+)$/,
+      path
+    ) as Array<string>;
+    const [, owner, repo, tagOrCommit, githubPath] = all;
+
+    let text = await fetchTextFromGitHub({
+      owner,
+      repo,
+      tagOrCommit,
+      path: githubPath
+    });
+
+    let contentType = "text/plain";
+    if (/\.svg$/.test(githubPath)) {
+      contentType = "image/svg+xml";
+    }
+
+    return new Response(text, {
+      headers: {
+        "Content-Type": contentType
+      }
+    });
+  }
 
   if (/^(graphql|graphql\.css)(\/?|\/.+)$/.test(path)) {
     const all = match(

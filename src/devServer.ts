@@ -86,6 +86,14 @@ export function makeServer({ port }: { port: number }): Hapi.Server {
       },
       handler: handler
     },
+    {
+      method: ["get"],
+      path: "/1/{extra*}",
+      options: {
+        cors: true,
+      },
+      handler: handler
+    },
   ]);
 
   return server;
