@@ -7,7 +7,6 @@ import * as GraphQLCSSServer from "./graphql/GraphQLCSSServer";
 import { GraphQLRequestSource } from "./graphql/source";
 import { fetchTextFromGitHub } from "./sources/gitHub";
 import { parseSVGDocument, listAllFillsFromSVGDocument } from "./modules/SVG";
-import { string } from "joi";
 
 interface JSONResponseInput {
   meta?: {};
@@ -88,6 +87,13 @@ export async function handleRequestThrowing(
         }
       }
 
+      const defaultFill = url.searchParams.get("defaultFill");
+      if (defaultFill !== null) {
+        text = text.replace(/<\/svg>/, input => {
+          return `<style>svg { fill: ${defaultFill}; }</style>${input}`;
+        });
+      }
+
       const newFill = url.searchParams.get("fill");
       if (newFill !== null) {
         text = text.replace(/<\/svg>/, input => {
@@ -96,9 +102,13 @@ export async function handleRequestThrowing(
       }
 
       const fillReplacements = new Map<string, string>();
-      url.searchParams.forEach((value, key) => {
-        const [, findColor] = match(/^fill\[(.+)\]$/, key);
-        if (findColor !== undefined) {
+      const pairs = url.search.substring(1).split("&");
+      // return jsonResponse({ data: pairs });
+
+      pairs.forEach((pair) => {
+        const [key, value] = pair.split("=").map(decodeURIComponent);
+        const [, findColor] = match(/^fill\[([^\]]+)\]$/, key);
+        if (findColor !== undefined && value !== undefined) {
           fillReplacements.set(findColor, value);
         }
       });
