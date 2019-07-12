@@ -8,6 +8,14 @@ async function queryCSS(query: string): Promise<string> {
   return await res.text();
 }
 
+async function queryCSSTS(query: string): Promise<string> {
+  const res = await handleRequestThrowing({
+    url: `http://localhost/1/graphql.css.ts?query=${encodeURIComponent(query)}`
+  } as Request);
+
+  return await res.text();
+}
+
 describe("graphql.css", () => {
   describe("colors", () => {
     test("provided palette", async () => {
@@ -166,29 +174,72 @@ describe("graphql.css", () => {
 .text-double { font-size: 200%; }
 
 @media (min-width: 576px) {
-.text-xs { font-size: 0.75rem; }
-.text-base { font-size: 1rem; }
-.text-double { font-size: 200%; }
+.sm\\:text-xs { font-size: 0.75rem; }
+.sm\\:text-base { font-size: 1rem; }
+.sm\\:text-double { font-size: 200%; }
 }
 
 @media (min-width: 768px) {
-.text-xs { font-size: 0.75rem; }
-.text-base { font-size: 1rem; }
-.text-double { font-size: 200%; }
+.md\\:text-xs { font-size: 0.75rem; }
+.md\\:text-base { font-size: 1rem; }
+.md\\:text-double { font-size: 200%; }
 }
 
 @media (min-width: 992px) {
-.text-xs { font-size: 0.75rem; }
-.text-base { font-size: 1rem; }
-.text-double { font-size: 200%; }
+.lg\\:text-xs { font-size: 0.75rem; }
+.lg\\:text-base { font-size: 1rem; }
+.lg\\:text-double { font-size: 200%; }
 }
 
 @media (min-width: 1200px) {
-.text-xs { font-size: 0.75rem; }
-.text-base { font-size: 1rem; }
-.text-double { font-size: 200%; }
+.xl\\:text-xs { font-size: 0.75rem; }
+.xl\\:text-base { font-size: 1rem; }
+.xl\\:text-double { font-size: 200%; }
 }
-`);
+`
+      );
+    });
+
+    describe.skip("TypeScript generation", () => {
+      test("provided sizes with responsive true", async () => {
+        const ts = await queryCSSTS(`
+        {
+          buildCSSTypeScriptDefinitions {
+            typography(responsive: true, input: {
+              sizes: [
+                {name: "xs", cssValue: "0.75rem" },
+                {name: "base", cssValue: "1rem" },
+                {name: "double", cssValue: "200%" }
+              ]
+            }) {
+              function(name: "text", prefix: "text-", for: [SIZES]) {
+                typeScriptSource
+              }
+            }
+          }
+        }
+        `);
+        expect(ts).toEqual(
+          `type TextSize = "xs" | "base" | "double";
+type TextSuffix = TextSize;
+function text(suffixes: ...Array<TextSuffix>): string {
+  return suffixes.map(suffix => \`text-\${suffix}\`).join(" ");
+}
+text.sm = function textSm(suffixes: ...Array<TextSuffix>): string {
+  return suffixes.map(suffix => \`sm:\\text-\${suffix}\`).join(" ");
+}
+text.md = function textMd(suffixes: ...Array<TextSuffix>): string {
+  return suffixes.map(suffix => \`md:\\text-\${suffix}\`).join(" ");
+}
+text.lg = function textLg(suffixes: ...Array<TextSuffix>): string {
+  return suffixes.map(suffix => \`lg:\\text-\${suffix}\`).join(" ");
+}
+text.xl = function textXl(suffixes: ...Array<TextSuffix>): string {
+  return suffixes.map(suffix => \`xl:\\text-\${suffix}\`).join(" ");
+}
+`
+        );
+      });
     });
   });
 });
