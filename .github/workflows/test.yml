@@ -1,0 +1,12 @@
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: install
+        uses: actions/npm@master
+        run: npm ci
+      - name: test
+        uses: actions/npm@master
+        run: npm test
