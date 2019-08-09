@@ -7,6 +7,7 @@ import * as GraphQLCSSServer from "./graphql/GraphQLCSSServer";
 import { GraphQLRequestSource } from "./graphql/source";
 import { fetchTextFromGitHub } from "./sources/gitHub";
 import { parseSVGDocument, listAllFillsFromSVGDocument } from "./modules/SVG";
+import * as Collections from "./modules/Collections";
 
 interface JSONResponseInput {
   meta?: {};
@@ -105,7 +106,7 @@ export async function handleRequestThrowing(
       const pairs = url.search.substring(1).split("&");
       // return jsonResponse({ data: pairs });
 
-      pairs.forEach((pair) => {
+      pairs.forEach(pair => {
         const [key, value] = pair.split("=").map(decodeURIComponent);
         const [, findColor] = match(/^fill\[([^\]]+)\]$/, key);
         if (findColor !== undefined && value !== undefined) {
@@ -164,6 +165,28 @@ ${input}`;
       return GraphQLServer.handleRequestFromSource(source);
     } else if (type === "graphql.css") {
       return GraphQLCSSServer.handleRequestFromSource(source);
+    }
+  }
+
+  if (/^collections\/1\/.+$/.test(path)) {
+    const [, id] = match(/^collections\/1\/([^\/]+)$/, path) as Array<string>;
+
+    if (request.method === "PUT") {
+      if (request.body != null) {
+        Collections.write(id, request.body);
+        return new Response(null, { status: 200 });
+      }
+    } else if (request.method === "GET") {
+      const text = await Collections.read(id, "text");
+      if (text == null) {
+        return new Response(null, { status: 404 });
+      }
+
+      return new Response(text, {
+        headers: {
+          "Content-Type": "text/plain"
+        }
+      });
     }
   }
 
