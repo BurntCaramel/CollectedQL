@@ -31,6 +31,10 @@ query {
 }
 ```
 
+## Work with SVGs
+
+https://collected.systems/1/github/gilbarbara/logos/93e29467eea30b2981187822143f45e562662b5c/logos/atlassian.svg?fill=orange
+
 ## Generate CSS
 
 `GET https://collected.systems/1/graphql.css?query=…`
