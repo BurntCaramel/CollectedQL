@@ -13,7 +13,7 @@
     "@types/hapi": "^17.8.2",
     "@types/jest": "^23.3.12",
     "@types/marked": "^0.6.0",
-    "@types/node": "^10.12.18",
+    "@types/node": "^12.12.8",
     "@types/puppeteer-core": "^1.9.0",
     "@types/ramda": "^0.26.3",
     "@types/rgrove__parse-xml": "^1.1.0",
