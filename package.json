@@ -30,7 +30,7 @@
     "prettier": "^1.18.2",
     "puppeteer-core": "^1.17.0",
     "ts-jest": "^24.0.2",
-    "ts-node": "^7.0.1",
+    "ts-node": "^8.5.4",
     "ts-node-dev": "^1.0.0-pre.32",
     "typescript": "^3.4.5",
     "whatwg-url": "^7.0.0"
